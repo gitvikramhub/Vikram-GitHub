@@ -1,0 +1,28 @@
+{
+	"name": "MergeQuery",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "empDataSet",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> empDataSet",
+					"dataset": {
+						"referenceName": "empDataSet",
+						"type": "DatasetReference"
+					}
+				},
+				{
+					"name": "depDataSet",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> depDataSet",
+					"dataset": {
+						"referenceName": "depDataSet",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared empDataSet = let AdfDoc = AzureStorage.BlobContents(\"https://trialstorageaccount67890.blob.core.windows.net/trailcontainer6789/employee_new.txt\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared depDataSet = let AdfDoc = AzureStorage.BlobContents(\"https://trialstorageaccount67890.blob.core.windows.net/trailcontainer6789/department_new.txt\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared UserQuery = let Source = #\"empDataSet\",\r\n  #\"Merged queries\" = Table.NestedJoin(Source, {\"Department\"}, depDataSet, {\"DepId\"}, \"depDataSet\", JoinKind.Inner),\r\n  #\"Expanded depDataSet\" = Table.ExpandTableColumn(#\"Merged queries\", \"depDataSet\", {\"DepId\", \"DepartmentName\"}, {\"DepId\", \"DepartmentName\"}),\r\n  #\"Removed columns\" = Table.RemoveColumns(#\"Expanded depDataSet\", {\"DepId\", \"DepartmentName\"}),\r\n  #\"Merged queries 1\" = Table.NestedJoin(#\"Removed columns\", {\"Department\"}, depDataSet, {\"DepId\"}, \"depDataSet\", JoinKind.Inner),\r\n  #\"Expanded depDataSet 1\" = Table.ExpandTableColumn(#\"Merged queries 1\", \"depDataSet\", {\"DepId\", \"DepartmentName\"}, {\"DepId\", \"DepartmentName\"}),\r\n  #\"Removed columns 1\" = Table.RemoveColumns(#\"Expanded depDataSet 1\", {\"DepId\"}) in #\"Removed columns 1\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}

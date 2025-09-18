@@ -1,0 +1,48 @@
+{
+	"name": "MergeTransformation_PowerQuery",
+	"properties": {
+		"activities": [
+			{
+				"name": "MergeQuery",
+				"type": "ExecuteWranglingDataflow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "MergeQuery",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"queries": [
+						{
+							"queryName": "UserQuery",
+							"dataflowSinks": [
+								{
+									"name": "UserQueryoutputDataSet",
+									"dataset": {
+										"referenceName": "outputDataSet",
+										"type": "DatasetReference"
+									},
+									"script": "sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['MergeQuery_by_PowerQuery'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tEmpId,\n\t\tName,\n\t\tDepartment,\n\t\tCountry,\n\t\tDepartmentName\n\t),\n\tpartitionBy('hash', 1)) ~> UserQueryoutputDataSet"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-09-13T12:24:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

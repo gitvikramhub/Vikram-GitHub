@@ -1,0 +1,9 @@
+{
+	"name": "azureDataFactory6789",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d8744a80-9684-4f6b-8a68-d9dbe0a067a2",
+		"tenantId": "06d46f75-4a8f-4114-b041-14bb865ad9ee"
+	}
+}

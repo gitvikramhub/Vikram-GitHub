@@ -1,0 +1,29 @@
+{
+	"name": "sortDataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "trialLinkedServices6789",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "SortTransformation.txt",
+				"container": "trailcontainer6789"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "apple",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

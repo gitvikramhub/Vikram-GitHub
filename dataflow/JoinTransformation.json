@@ -1,0 +1,76 @@
+{
+	"name": "JoinTransformation",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "empDataSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "depDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "depDataSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "outputDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregatedData"
+				},
+				{
+					"name": "JoinedOnDepTable"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmpId as string,",
+				"          Name as string,",
+				"          Department as string,",
+				"          Country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empDataSource",
+				"source(output(",
+				"          DepId as string,",
+				"          DepartmentName as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> depDataSource",
+				"empDataSource aggregate(groupBy(Department),",
+				"     Count_Of_Employees = count(EmpId)) ~> aggregatedData",
+				"aggregatedData, depDataSource join(Department == DepartmentName,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> JoinedOnDepTable",
+				"JoinedOnDepTable sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Emp_Dep_JoinData_by_DeptId.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          DepartmentName,",
+				"          Count_Of_Employees",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

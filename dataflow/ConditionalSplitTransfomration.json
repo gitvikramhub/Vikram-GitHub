@@ -1,0 +1,55 @@
+{
+	"name": "ConditionalSplitTransfomration",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "empDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "empDataSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "depDataSet",
+						"type": "DatasetReference"
+					},
+					"name": "BusinessMagnetsData"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmpId as string,",
+				"          Name as string,",
+				"          Department as string,",
+				"          Country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empDataSource",
+				"empDataSource split(equals(Department,\"Business\"),",
+				"     equals(Department,\"Postal\"),",
+				"     equals(Department,\"Hardware\"),",
+				"     equals(Department,\"Software\"),",
+				"     disjoint: false) ~> split2@(Business, Postal, Hardware, Software)",
+				"split2@Business sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          DepId as string,",
+				"          DepartmentName as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> BusinessMagnetsData"
+			]
+		}
+	}
+}
